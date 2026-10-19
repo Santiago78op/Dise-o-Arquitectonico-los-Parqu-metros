@@ -16,7 +16,7 @@ información) y se trae al contexto de Guatemala, incluidos los cobros de cuidac
 | Carpeta | Contenido |
 |---|---|
 | `documento/` | El documento completo en PDF (con carátula, índice y referencias) y su `.docx` editable |
-| `presentacion/` | La presentación animada (`.pptx`), el guion general y un guion por integrante en `guiones/` |
+| `presentacion/` | La presentación animada (`.pptx`) y su versión en PDF, el guion general y un guion por integrante en `guiones/` |
 | `sitio/` | El sitio del proyecto (`index.html`) y el prototipo interactivo del parquímetro (`prototipo.html`) |
 | `diagramas/` | Las láminas en SVG y en Excalidraw editable: caso de negocio, casos de uso, bloques, despliegue y capturas del prototipo |
 
