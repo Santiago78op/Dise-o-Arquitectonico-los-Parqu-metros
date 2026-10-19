@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SIEP · Repensando los parquímetros</title>
+<meta name="description" content="Tarea 3 de Análisis y Diseño de Sistemas 2 (USAC): una solución desde la arquitectura del software para el caso Repensando los parquímetros, con el contexto de Guatemala.">
+
+<!--
+  Sitio del proyecto. Parte de la plantilla de vitrina medida del segundo cerebro
+  (diseno-web/practica/39-plantilla-landing-vitrina.html): mejora progresiva, tema claro
+  por omisión con «vitrina» oscuro a un clic, todo el movimiento detrás de
+  prefers-reduced-motion y un solo acento con contraste medido. Se quitaron el carrusel
+  y la cinta: acá no cumplen función. La escena fija muestra los tres momentos de uso.
+-->
+
+<script>
+  (function (h) {
+    h.classList.add('js');
+    try { if (localStorage.getItem('tema') === 'vitrina') h.dataset.tema = 'vitrina'; } catch (e) {}
+    if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      h.classList.add('mov');
+      setTimeout(function () { if (!h.classList.contains('listo')) h.classList.remove('mov'); }, 3000);
+    }
+  })(document.documentElement);
+</script>
+
+<style>
+/* ───────── TOKENS ───────── */
+:root {
+  --accion: #0071e3;            /* texto blanco encima: 4,70:1 */
+  --accion-fuerte: #0062c4;
+  --fuente: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radio: 18px;
+  --pildora: 980px;
+  --ancho: 70rem;
+  --aire: clamp(4.5rem, 3.5rem + 5vw, 8rem);
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --dur-micro: 200ms;
+  --dur-hover: 350ms;
+}
+.tono-a { --bg: #ffffff; --fg: #1d1d1f; --fg2: #6e6e73; --link: #0066cc; --sup: #f5f5f7;
+          --linea: rgb(0 0 0 / .1); --bisel: rgb(255 255 255 / .9); --sombra: rgb(0 0 0 / .12);
+          --foco: #0071e3; --glow: rgb(0 113 227 / .14); --desenfoque: none; --panel: #ffffff; }
+.tono-b { --bg: #f5f5f7; --fg: #1d1d1f; --fg2: #6e6e73; --link: #0066cc; --sup: #ffffff;
+          --linea: rgb(0 0 0 / .1); --bisel: rgb(255 255 255 / .9); --sombra: rgb(0 0 0 / .12);
+          --foco: #0071e3; --glow: rgb(0 113 227 / .12); --desenfoque: none; --panel: #ffffff; }
+[data-tema="vitrina"] .tono-a {
+  --bg: #000000; --fg: #f5f5f7; --fg2: #a1a1a6; --link: #2997ff; --sup: rgb(255 255 255 / .06);
+  --linea: rgb(255 255 255 / .1); --bisel: rgb(255 255 255 / .12); --sombra: rgb(0 0 0 / .6);
+  --foco: #2997ff; --glow: rgb(0 113 227 / .35); --desenfoque: blur(20px) saturate(180%); --panel: #ffffff;
+}
+
+/* ───────── BASE ───────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 4.5rem; }
+body { margin: 0; font-family: var(--fuente); font-size: 1.0625rem; line-height: 1.55; color: #1d1d1f;
+       background: #fff; -webkit-font-smoothing: antialiased; }
+[data-tema="vitrina"] body { background: #000; }
+h1, h2, h3, p, ul, ol, figure, blockquote, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--foco, #0071e3); outline-offset: 3px; border-radius: 4px; }
+.solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.saltar { position: absolute; left: 1rem; top: -4rem; z-index: 100; padding: .6rem 1rem; border-radius: 8px; background: #1d1d1f; color: #fff; }
+.saltar:focus { top: 1rem; }
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.icono { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.5;
+         stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ───────── SECCIÓN ───────── */
+.seccion { position: relative; padding-block: var(--aire); background: var(--bg); color: var(--fg); overflow: clip; }
+.contenedor { width: min(100% - 2.5rem, var(--ancho)); margin-inline: auto; position: relative; z-index: 1; }
+.antetitulo { font-size: .875rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--fg2); }
+.titulo { font-size: clamp(2rem, 1.3rem + 3vw, 3.4rem); font-weight: 700; line-height: 1.08; letter-spacing: -.025em;
+          text-wrap: balance; margin-block: .5rem 1rem; max-width: 52rem; }
+.bajada { font-size: clamp(1.0625rem, 1rem + .5vw, 1.3125rem); color: var(--fg2); max-width: 40rem; text-wrap: pretty; }
+.cabecera { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.cabecera--centro { text-align: center; } .cabecera--centro .titulo, .cabecera--centro .bajada { margin-inline: auto; }
+.glow { position: absolute; z-index: 0; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, var(--glow), transparent); }
+.nota-fuente { margin-top: 1.5rem; font-size: .875rem; color: var(--fg2); }
+
+/* ───────── BOTONES ───────── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: .7rem 1.4rem;
+       border: 0; border-radius: var(--pildora); background: var(--accion); color: #fff; font-weight: 600; text-decoration: none;
+       transition: background-color var(--dur-micro), scale var(--dur-hover) var(--ease); }
+.btn:hover { background: var(--accion-fuerte); }
+.btn:active { scale: .97; }
+.btn--grande { padding: .95rem 2rem; font-size: 1.125rem; }
+.btn--sec { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--linea); }
+.btn--sec:hover { background: var(--sup); }
+.enlace { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.75rem; color: var(--link); font-weight: 500; text-decoration: none; }
+.enlace:hover { text-decoration: underline; text-underline-offset: .2em; }
+.enlace .icono { transition: transform var(--dur-hover) var(--ease); }
+@media (hover: hover) { .enlace:hover .icono { transform: translateX(4px); } }
+
+/* ───────── NAV ───────── */
+.nav { position: fixed; inset: 0 0 auto 0; z-index: 50; --foco: #0071e3; color: #1d1d1f; padding-top: env(safe-area-inset-top);
+       background: transparent; border-bottom: 1px solid transparent; transition: background-color .3s, border-color .3s; }
+[data-tema="vitrina"] .nav { color: #f5f5f7; --foco: #2997ff; }
+.nav--compacta { background: rgb(255 255 255 / .82); border-bottom-color: rgb(0 0 0 / .08);
+                 backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+[data-tema="vitrina"] .nav--compacta { background: rgb(22 22 23 / .82); border-bottom-color: rgb(255 255 255 / .1); }
+.nav__fila { display: flex; align-items: center; gap: 1rem; min-height: 4rem; }
+.logo { display: inline-flex; align-items: center; gap: .5rem; font-weight: 700; text-decoration: none; min-height: 2.75rem; }
+.logo .icono { color: var(--accion); width: 1.5rem; height: 1.5rem; }
+[data-tema="vitrina"] .logo .icono { color: #2997ff; }
+.nav__links { display: flex; gap: .1rem; margin-left: auto; }
+.nav__links a { position: relative; display: inline-flex; align-items: center; min-height: 2.75rem; padding-inline: .65rem; font-size: .9375rem; text-decoration: none; }
+.nav__links a::after { content: ""; position: absolute; left: .65rem; right: .65rem; bottom: .55rem; height: 1px; background: currentColor;
+                       transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
+.nav__links a:hover::after, .nav__links a[aria-current="true"]::after { transform: scaleX(1); }
+.nav__acciones { display: flex; align-items: center; gap: .5rem; }
+.nav .btn { padding: .4rem 1rem; font-size: .9375rem; }
+.btn-icono { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; border-radius: 50%; background: transparent; }
+.btn-icono:hover { background: rgb(128 128 128 / .18); }
+.nav__menu { display: none; }
+@media (max-width: 61.99rem) {
+  .nav__fila { flex-wrap: wrap; }
+  .nav__acciones { margin-left: auto; }
+  .nav__links { order: 3; flex-basis: 100%; flex-direction: column; margin: 0; padding-bottom: .75rem; }
+  .js .nav__menu { display: inline-grid; }
+  .js .nav__links { display: none; }
+  .js .nav--abierta { bottom: 0; background: #fff; overflow-y: auto; }
+  [data-tema="vitrina"].js .nav--abierta { background: #000; }
+  .js .nav--abierta .nav__links { display: flex; padding-top: 1.5rem; }
+  .js .nav--abierta .nav__links a { min-height: 3.5rem; font-size: 1.6rem; font-weight: 600; }
+  html.menu-abierto { overflow: hidden; }
+}
+.progreso { position: fixed; inset: 0 0 auto 0; z-index: 60; height: 3px; pointer-events: none; display: none; transform-origin: left;
+            background: linear-gradient(90deg, #2997ff, #0071e3); }
+@supports (animation-timeline: scroll()) { .progreso { display: block; animation: progreso linear both; animation-timeline: scroll(root); } }
+@keyframes progreso { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ───────── HERO ───────── */
+.hero { padding-top: clamp(6.5rem, 5.5rem + 3vw, 8rem); }
+.hero__grid { display: grid; gap: 3rem; align-items: center; }
+@media (min-width: 56rem) { .hero__grid { grid-template-columns: 1.15fr .85fr; } }
+.hero h1 { font-size: clamp(2.5rem, 1.5rem + 4vw, 5rem); font-weight: 700; line-height: 1.04; letter-spacing: -.03em; margin-block: .75rem 1.25rem; }
+.mascara { display: block; overflow: hidden; padding-bottom: .12em; }
+.mascara > span { display: block; background: linear-gradient(180deg, var(--fg) 30%, var(--fg2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem; margin-top: 2rem; }
+.hero__visual { position: relative; display: grid; place-items: center; }
+.hero .glow { width: min(90vw, 42rem); aspect-ratio: 1; right: -10%; top: 0; }
+
+/* El parquímetro, dibujado con CSS: cabeza, pantalla y poste */
+.parq { --w: min(64vw, 17rem); position: relative; width: var(--w); display: grid; justify-items: center; }
+.parq__cabeza { position: relative; width: 100%; aspect-ratio: .78; border-radius: 26px 26px 18px 18px;
+                background: linear-gradient(160deg, #2b2f36, #121418 70%); padding: 9% 8% 0;
+                box-shadow: 0 1.5rem 3rem -1rem var(--sombra), inset 0 1px 0 rgb(255 255 255 / .15); }
+.parq__marca { display: flex; justify-content: space-between; align-items: center; color: #d2d2d7; font-size: .75rem; font-weight: 600; letter-spacing: .06em; margin-bottom: .6rem; }
+.parq__p { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 6px; background: #0b5cad; color: #fff; font-weight: 800; }
+.parq__pantalla { position: relative; height: 62%; border-radius: 10px; background: #f5f5f7; overflow: hidden; box-shadow: inset 0 0 0 3px #0b0c0e; }
+.parq__ranura { width: 40%; height: .45rem; border-radius: 99px; background: #0b0c0e; margin: 8% auto 0; }
+.parq__poste { width: 18%; height: clamp(5rem, 14vw, 8rem); background: linear-gradient(90deg, #3a3e45, #1d2025 60%); border-radius: 0 0 6px 6px; }
+.pantalla { position: absolute; inset: 0; padding: 9% 9%; color: #111418; display: flex; flex-direction: column; gap: .4rem; font-size: .8rem; }
+.pantalla__paso { font-size: .7rem; font-weight: 700; letter-spacing: .06em; color: #0b5cad; text-transform: uppercase; }
+.pantalla__grande { font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; }
+.pantalla__placa { display: flex; gap: .4rem; align-items: center; border: 2px solid #111418; border-radius: 6px; padding: .3rem .5rem;
+                   font: 800 1.05rem/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; }
+.pantalla__placa b { background: #111418; color: #fff; border-radius: 3px; padding: .1rem .3rem; }
+.pantalla__barra { margin-top: auto; background: #0b5cad; color: #fff; border-radius: 6px; text-align: center; padding: .35rem; font-weight: 700; }
+.pantalla__ok { color: #0f7a3a; }
+.pantalla__fila { display: flex; justify-content: space-between; border-bottom: 1px solid #d2d2d7; padding-block: .15rem; }
+.pantalla--antes .pantalla__senal { display: grid; place-items: center; gap: .35rem; margin-top: auto; margin-bottom: auto; text-align: center; }
+.pantalla--antes .parq__p { width: 3rem; height: 3rem; font-size: 1.7rem; border-radius: 10px; }
+
+/* ───────── TARJETAS ───────── */
+.grilla { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.tarjeta { position: relative; padding: 1.75rem; border-radius: var(--radio); background: var(--sup);
+           box-shadow: inset 0 1px 0 var(--bisel), inset 0 0 0 1px var(--linea);
+           backdrop-filter: var(--desenfoque); -webkit-backdrop-filter: var(--desenfoque); }
+.tarjeta--sube { transition: transform var(--dur-hover) var(--ease); }
+.tarjeta--sube::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; box-shadow: 0 1.5rem 3rem -1rem var(--sombra);
+                         opacity: 0; transition: opacity var(--dur-hover) var(--ease); }
+@media (hover: hover) { .tarjeta--sube:hover { transform: translateY(-6px); } .tarjeta--sube:hover::before { opacity: 1; } }
+.tarjeta h3 { font-size: 1.1875rem; font-weight: 600; letter-spacing: -.01em; margin-block: 1.1rem .4rem; }
+.tarjeta p { color: var(--fg2); font-size: 1rem; }
+.mosaico { display: inline-grid; place-items: center; width: 3rem; height: 3rem; border-radius: 12px; color: #fff;
+           background: linear-gradient(140deg, #2997ff, #0062c4); box-shadow: inset 0 1px 0 rgb(255 255 255 / .3); }
+.mosaico .icono { width: 1.5rem; height: 1.5rem; }
+.etiqueta { display: inline-block; align-self: flex-start; margin-top: 1rem; padding: .2rem .7rem; border-radius: 99px; font-size: .8125rem; font-weight: 600;
+            color: var(--link); box-shadow: inset 0 0 0 1px var(--linea); }
+
+/* ───────── CIFRAS ───────── */
+.cifras { display: grid; gap: 2.5rem 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
+.cifra__num { display: block; font-size: clamp(2.6rem, 2rem + 3vw, 4.25rem); font-weight: 700; letter-spacing: -.03em; line-height: 1;
+              font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cifra__unidad { font-size: .5em; font-weight: 600; margin-left: .1em; }
+.cifra dd { margin-top: .7rem; color: var(--fg2); }
+.cifra dd strong { color: var(--fg); font-weight: 600; }
+
+/* ───────── ESCENA FIJA: antes, durante, después ───────── */
+.escena__fija { display: grid; gap: 3rem; align-items: center; }
+.escena__visual { display: grid; place-items: center; }
+.pasos { display: grid; gap: 2.25rem; }
+.paso h3 { font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.1; margin-block: .35rem .6rem; }
+.paso p { color: var(--fg2); max-width: 30rem; }
+.paso__n { font-size: .875rem; font-weight: 600; letter-spacing: .08em; color: var(--link); }
+.escena .pantalla + .pantalla { opacity: 0; }
+html:not(.mov) .escena .pantalla--antes { opacity: 1; }
+@media (min-width: 48rem) {
+  .escena__fija { grid-template-columns: 1fr 1fr; }
+  .escena--fija { padding-block: 0; }
+  .escena--fija .escena__fija { min-height: 100vh; }
+  .escena--fija .pasos { position: relative; min-height: 18rem; }
+  .escena--fija .paso { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; }
+}
+
+/* ───────── BENTO de alternativas ───────── */
+.bento { display: grid; gap: .75rem; grid-template-columns: 1fr; grid-template-areas: "a" "b" "c" "d"; }
+.bento > * { padding: 1.75rem; min-height: 12rem; display: flex; flex-direction: column; justify-content: flex-end; }
+.bento h3 { margin-top: .4rem; }
+.b-a { grid-area: a; min-height: 20rem; color: #f5f5f7; background: radial-gradient(120% 90% at 15% 0%, #2a5a9c, #06162e 70%);
+       box-shadow: inset 0 1px 0 rgb(255 255 255 / .16); }
+.b-a p { color: #d2d2d7; } .b-a .etiqueta { color: #9ecbff; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .25); }
+.b-b { grid-area: b; } .b-c { grid-area: c; } .b-d { grid-area: d; }
+.tarjeta .bento__dato { color: inherit; font-size: clamp(2rem, 1.4rem + 2.5vw, 3.2rem); font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+@media (min-width: 40rem) { .bento { grid-template-columns: 1fr 1fr; grid-template-areas: "a a" "b c" "d d"; } }
+@media (min-width: 62rem) { .bento { grid-template-columns: repeat(3, 1fr); grid-template-areas: "a a b" "a a c" "d d d"; } }
+
+/* ───────── FIGURA (láminas blancas: en vitrina van sobre un panel claro) ───────── */
+.figura { margin-top: 2.5rem; padding: clamp(.75rem, 2vw, 1.5rem); border-radius: var(--radio); background: var(--panel);
+          box-shadow: inset 0 0 0 1px var(--linea); }
+.figura img { width: 100%; height: auto; }
+.figura figcaption { margin-top: .75rem; font-size: .875rem; color: #6e6e73; text-align: center; }
+.decisiones { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); margin-top: 2.5rem; }
+.decision { padding: 1.25rem 1.4rem; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--linea); }
+.decision strong { display: block; margin-bottom: .3rem; }
+.decision p { color: var(--fg2); font-size: .975rem; }
+
+/* ───────── PROTOTIPO ───────── */
+.marco { margin-top: 2rem; border-radius: var(--radio); overflow: hidden; box-shadow: 0 2rem 4rem -1.5rem var(--sombra), inset 0 0 0 1px var(--linea);
+         background: #e9ebee; }
+.marco__barra { display: flex; gap: .4rem; align-items: center; padding: .6rem .9rem; background: #d9dce1; color: #3a3e45; font-size: .8125rem; }
+.marco__barra i { width: .7rem; height: .7rem; border-radius: 50%; background: #b5b9c0; }
+.marco__barra span { margin-left: .6rem; }
+.marco iframe { display: block; width: 100%; height: clamp(46rem, 80vh, 56rem); border: 0; background: #e9ebee; }
+@media (max-width: 56rem) { .marco iframe { height: 100rem; } }
+
+/* ───────── LÍNEA DE FASES ───────── */
+.fases { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); counter-reset: fase; }
+.fase { position: relative; padding: 1.5rem 1.4rem 1.6rem; border-radius: var(--radio); background: var(--sup); box-shadow: inset 0 0 0 1px var(--linea); }
+.fase::before { content: ""; position: absolute; left: 1.4rem; right: 1.4rem; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--accion); }
+.fase__n { font-size: 2rem; font-weight: 700; letter-spacing: -.02em; color: var(--link); }
+.fase h3 { font-size: 1.1rem; margin-block: .2rem .4rem; }
+.fase p { color: var(--fg2); font-size: .975rem; }
+.metodos { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); margin-bottom: 1.25rem; }
+
+/* ───────── EQUIPO ───────── */
+.persona h3 { margin-top: 0; }
+.persona__rol { color: var(--link); font-weight: 600; font-size: .9375rem; margin-bottom: .6rem; }
+.ramas { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; color: var(--fg2); font-size: .9375rem; }
+.rama { display: inline-flex; align-items: center; gap: .35rem; padding: .25rem .7rem; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--linea);
+        font: 600 .8125rem/1.4 ui-monospace, Menlo, monospace; color: var(--fg); }
+.rama .icono { width: 1rem; height: 1rem; color: var(--link); }
+
+/* ───────── FAQ ───────── */
+.faq { max-width: 48rem; margin-inline: auto; border-top: 1px solid var(--linea); }
+.faq__item { border-bottom: 1px solid var(--linea); }
+.faq h3 { font-size: inherit; font-weight: inherit; }
+.faq__boton { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; min-height: 4rem; padding: 1rem 0;
+              border: 0; background: none; text-align: left; font-size: 1.125rem; font-weight: 600; color: var(--fg); }
+.faq__boton .icono { transition: transform .4s var(--ease); color: var(--fg2); }
+.faq__boton[aria-expanded="true"] .icono { transform: rotate(180deg); }
+.faq__panel { display: grid; grid-template-rows: 1fr; }
+.faq__panel > div { overflow: hidden; }
+.faq__panel p { padding-bottom: 1.25rem; color: var(--fg2); max-width: 42rem; }
+.js .faq__panel { grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease); }
+.js .faq__panel > div { visibility: hidden; transition: visibility 0s .4s; }
+.js .faq__item--abierta .faq__panel { grid-template-rows: 1fr; }
+.js .faq__item--abierta .faq__panel > div { visibility: visible; transition-delay: 0s; }
+html:not(.js) .faq__boton .icono { display: none; }
+
+/* ───────── DESCARGAS ───────── */
+.cta { text-align: center; }
+.cta .glow { width: min(130vw, 70rem); aspect-ratio: 1.6; left: 50%; top: 50%; translate: -50% -50%; }
+.cta .bajada { margin: 0 auto 2rem; }
+.descargas { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+
+/* ───────── PIE ───────── */
+.pie { padding-block: 4rem 2.5rem; font-size: .9375rem; }
+.pie__grid { display: grid; gap: 2.5rem 2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+@media (min-width: 62rem) { .pie__grid { grid-template-columns: 1.4fr 1fr 1.6fr; } }
+.pie h2 { font-size: .875rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg2); margin-bottom: .6rem; }
+.pie li { padding-block: .25rem; }
+.pie li a { text-decoration: none; }
+.pie li a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.pie p, .pie li { color: var(--fg2); }
+.pie__base { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 2rem; margin-top: 3rem; padding-top: 1.5rem;
+             border-top: 1px solid var(--linea); color: var(--fg2); }
+
+/* ───────── MOVIMIENTO ───────── */
+.mov .revelar > *, .mov .mascara > span { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<!-- Íconos Lucide (licencia ISC) incrustados como sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></symbol>
+  <symbol id="i-banknote" viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2" /> <circle cx="12" cy="12" r="2" /> <path d="M6 12h.01M18 12h.01" /></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /> <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" /> <circle cx="7" cy="17" r="2" /> <path d="M9 17h6" /> <circle cx="17" cy="17" r="2" /></symbol>
+  <symbol id="i-chart-column" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+  <symbol id="i-credit-card" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2" /> <line x1="2" x2="22" y1="10" y2="10" /></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" /> <path d="M3 5V19A9 3 0 0 0 21 19V5" /> <path d="M3 12A9 3 0 0 0 21 12" /></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <polyline points="7 10 12 15 17 10" /> <line x1="12" x2="12" y1="15" y2="3" /></symbol>
+  <symbol id="i-factory" viewBox="0 0 24 24"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" /> <path d="M17 18h1" /> <path d="M12 18h1" /> <path d="M7 18h1" /></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4" /> <path d="M3.34 19a10 10 0 1 1 17.32 0" /></symbol>
+  <symbol id="i-git-branch" viewBox="0 0 24 24"><line x1="6" x2="6" y1="3" y2="15" /> <circle cx="18" cy="6" r="3" /> <circle cx="6" cy="18" r="3" /> <path d="M18 9a9 9 0 0 1-9 9" /></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /> <path d="M2 12h20" /></symbol>
+  <symbol id="i-hand-coins" viewBox="0 0 24 24"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17" /> <path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" /> <path d="m2 16 6 6" /> <circle cx="16" cy="9" r="2.9" /> <circle cx="6" cy="5" r="3" /></symbol>
+  <symbol id="i-landmark" viewBox="0 0 24 24"><line x1="3" x2="21" y1="22" y2="22" /> <line x1="6" x2="6" y1="18" y2="11" /> <line x1="10" x2="10" y1="18" y2="11" /> <line x1="14" x2="14" y1="18" y2="11" /> <line x1="18" x2="18" y1="18" y2="11" /> <polygon points="12 2 20 7 4 7" /></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2" /> <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></symbol>
+  <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12" /> <line x1="4" x2="20" y1="6" y2="6" /> <line x1="4" x2="20" y1="18" y2="18" /></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2" /> <line x1="8" x2="16" y1="21" y2="21" /> <line x1="12" x2="12" y1="17" y2="21" /></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></symbol>
+  <symbol id="i-parking-meter" viewBox="0 0 24 24"><path d="M11 15h2" /> <path d="M12 12v3" /> <path d="M12 19v3" /> <path d="M15.282 19a1 1 0 0 0 .948-.68l2.37-6.988a7 7 0 1 0-13.2 0l2.37 6.988a1 1 0 0 0 .948.68z" /> <path d="M9 9a3 3 0 1 1 6 0" /></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1" /> <rect x="6" y="4" width="4" height="16" rx="1" /></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" /></symbol>
+  <symbol id="i-presentation" viewBox="0 0 24 24"><path d="M2 3h20" /> <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" /> <path d="m7 21 5-5 5 5" /></symbol>
+  <symbol id="i-radio-tower" viewBox="0 0 24 24"><path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" /> <path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" /> <circle cx="12" cy="9" r="2" /> <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" /> <path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" /> <path d="M9.5 18h5" /> <path d="m8 22 4-11 4 11" /></symbol>
+  <symbol id="i-scan-line" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2" /> <path d="M17 3h2a2 2 0 0 1 2 2v2" /> <path d="M21 17v2a2 2 0 0 1-2 2h-2" /> <path d="M7 21H5a2 2 0 0 1-2-2v-2" /> <path d="M7 12h10" /></symbol>
+  <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></symbol>
+  <symbol id="i-smartphone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /> <path d="M12 18h.01" /></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /></symbol>
+  <symbol id="i-tablet-smartphone" viewBox="0 0 24 24"><rect width="10" height="14" x="3" y="8" rx="2" /> <path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4" /> <path d="M8 18h.01" /></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2" /> <line x1="12" x2="15" y1="14" y2="11" /> <circle cx="12" cy="14" r="8" /></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <circle cx="9" cy="7" r="4" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <path d="M16 3.13a4 4 0 0 1 0 7.75" /></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+</svg>
+
+<div class="progreso" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <nav class="contenedor nav__fila" aria-label="Principal">
+    <a class="logo" href="#inicio"><svg class="icono" aria-hidden="true"><use href="#i-parking-meter"/></svg>SIEP</a>
+    <ul class="nav__links" id="menu">
+      <li><a href="#problema">Problema</a></li>
+      <li><a href="#guatemala">Guatemala</a></li>
+      <li><a href="#solucion">Solución</a></li>
+      <li><a href="#calidad">Calidad</a></li>
+      <li><a href="#prototipo">Prototipo</a></li>
+      <li><a href="#equipo">Equipo</a></li>
+    </ul>
+    <div class="nav__acciones">
+      <button class="btn-icono" id="tema" type="button" aria-pressed="false" aria-label="Tema oscuro de vitrina">
+        <svg class="icono" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+      <a class="btn" href="#descargas">Descargas</a>
+      <button class="btn-icono nav__menu" id="abrir-menu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menú">
+        <svg class="icono" aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </nav>
+</header>
+<div id="centinela" aria-hidden="true" style="position:absolute;top:0;height:5rem;width:1px"></div>
+
+<main id="contenido">
+
+  <!-- HERO -->
+  <section class="seccion tono-a hero" id="inicio">
+    <div class="glow" data-paralaje="-18" aria-hidden="true"></div>
+    <div class="contenedor hero__grid">
+      <div class="hero__texto">
+        <p class="antetitulo revelar"><span>Tarea 3 · Caso 4 · Análisis y Diseño de Sistemas 2</span></p>
+        <h1>
+          <span class="mascara"><span>Repensar el parquímetro,</span></span>
+          <span class="mascara"><span>empezando por la placa.</span></span>
+        </h1>
+        <div class="revelar">
+          <p class="bajada">SIEP es nuestra propuesta para el caso <em>Repensando los parquímetros</em>: el pago queda ligado a la placa, el equipo que ya existe cobra con tarjeta y avisa si lo dañan, y todo lo que se cobra se publica.</p>
+          <p class="hero__acciones">
+            <a class="btn btn--grande magnetico" href="#prototipo">Probar el prototipo</a>
+            <a class="enlace" href="#descargas">Leer el documento <svg class="icono" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          </p>
+        </div>
+      </div>
+      <div class="hero__visual revelar">
+        <div class="parq" role="img" aria-label="Ilustración del parquímetro con la placa P 123ABC escrita en la pantalla">
+          <div class="parq__cabeza">
+            <div class="parq__marca"><span class="parq__p">P</span><span>0412</span></div>
+            <div class="parq__pantalla">
+              <div class="pantalla">
+                <span class="pantalla__paso">1 · Placa</span>
+                <span class="pantalla__grande">Escriba su placa</span>
+                <span class="pantalla__placa"><b>P</b>123ABC</span>
+                <span>Q3 por 30 min · máx. 4 h</span>
+                <span class="pantalla__barra">Continuar</span>
+              </div>
+            </div>
+            <div class="parq__ranura"></div>
+          </div>
+          <div class="parq__poste"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMA -->
+  <section class="seccion tono-b" id="problema">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">El problema</p>
+        <h2 class="titulo">Tres de los seis problemas no se arreglan con una pantalla mejor.</h2>
+        <p class="bajada">SERVIparq, el programa de parquímetros de la Ciudad de México, encontró seis problemas. Los ordenamos por su causa: así se ve qué necesita diseño de información y qué necesita arquitectura y gobierno.</p>
+      </header>
+      <ul class="grilla revelar">
+        <li class="tarjeta tarjeta--sube"><span class="mosaico"><svg class="icono" aria-hidden="true"><use href="#i-users"/></svg></span>
+          <h3>Vecinos que no fueron consultados</h3><p>El programa se instaló sin preguntar. La inconformidad empieza antes del primer cobro.</p><span class="etiqueta">Gobierno · P-01</span></li>
+        <li class="tarjeta tarjeta--sube"><span class="mosaico"><svg class="icono" aria-hidden="true"><use href="#i-hand-coins"/></svg></span>
+          <h3>Cuidacarros que siguen cobrando</h3><p>Personas ajenas al programa apartan el lugar y cobran por él. El caso, mexicano, les dice «franeleros».</p><span class="etiqueta">Cobro informal · P-02</span></li>
+        <li class="tarjeta tarjeta--sube"><span class="mosaico"><svg class="icono" aria-hidden="true"><use href="#i-parking-meter"/></svg></span>
+          <h3>Instrucciones confusas y solo monedas</h3><p>El panel no sigue el orden en que la gente usa el parquímetro, y sin cambio no se puede pagar.</p><span class="etiqueta">Información · P-03</span></li>
+        <li class="tarjeta tarjeta--sube"><span class="mosaico"><svg class="icono" aria-hidden="true"><use href="#i-file-text"/></svg></span>
+          <h3>No se sabe cómo reclamar</h3><p>Quien recibe una multa injusta no sabe a quién acudir ni cuánto tarda la respuesta.</p><span class="etiqueta">Información · P-04</span></li>
+        <li class="tarjeta tarjeta--sube"><span class="mosaico"><svg class="icono" aria-hidden="true"><use href="#i-wrench"/></svg></span>
+          <h3>Falta personal</h3><p>El equipo ya podía cobrar con tarjeta y avisar vandalismo, pero esas funciones estaban apagadas.</p><span class="etiqueta">Capacidad · P-05</span></li>
+        <li class="tarjeta tarjeta--sube"><span class="mosaico"><svg class="icono" aria-hidden="true"><use href="#i-landmark"/></svg></span>
+          <h3>Nadie ve a dónde va el dinero</h3><p>El 70 % opera y mantiene, el 30 % vuelve a la comunidad. Pero nadie lo publica, y el sistema parece corrupto.</p><span class="etiqueta">Gobierno · P-06</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- GUATEMALA -->
+  <section class="seccion tono-a" id="guatemala" aria-labelledby="t-gt">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">Investigación</p>
+        <h2 class="titulo" id="t-gt">En Guatemala se cobra por media hora, y también cobran los cuidacarros.</h2>
+        <p class="bajada">Trajimos el caso a casa. Las cifras salen de notas de prensa verificadas; las fuentes están al pie de la página.</p>
+      </header>
+      <dl class="cifras revelar">
+        <div class="cifra"><dt><span class="cifra__num">Q3<span class="cifra__unidad">/30 min</span></span></dt>
+          <dd><strong>Tarifa en la capital</strong>, según el Acuerdo COM-40-2022, vigente desde febrero de 2024.</dd></div>
+        <div class="cifra"><dt><span class="cifra__num"><span data-contar="2500">2,500</span></span></dt>
+          <dd><strong>Objetos retirados</strong> en un operativo de la PMT (2023): botes, llantas y sillas que apartaban lugares.</dd></div>
+        <div class="cifra"><dt><span class="cifra__num"><span data-contar="33">33</span></span></dt>
+          <dd><strong>Personas identificadas</strong> cobrando entre Q35 y US$50 a turistas en la zona 13 (abril de 2026).</dd></div>
+        <div class="cifra"><dt><span class="cifra__num">Q12.3<span class="cifra__unidad">M</span></span></dt>
+          <dd><strong>Cobró Antigua en 2025</strong> por estacionamiento, con su marbete digital MarbEx. En 2026 la Corte suspendió su base de placas.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ESCENA: ANTES, DURANTE, DESPUÉS -->
+  <section class="seccion tono-a escena" id="momentos">
+    <div class="glow" data-paralaje="22" aria-hidden="true" style="width:min(80vw,40rem);aspect-ratio:1;left:-10%;top:5%"></div>
+    <div class="contenedor">
+      <div class="escena__fija">
+        <div class="escena__visual">
+          <div class="parq" role="img" aria-label="El parquímetro pasa por tres pantallas: la señal de la zona, el ingreso de la placa y el comprobante">
+            <div class="parq__cabeza">
+              <div class="parq__marca"><span class="parq__p">P</span><span>0412</span></div>
+              <div class="parq__pantalla">
+                <div class="pantalla pantalla--antes">
+                  <span class="pantalla__paso">Antes</span>
+                  <div class="pantalla__senal"><span class="parq__p">P</span><span class="pantalla__grande">Zona con parquímetro</span><span>Q3 por 30 min · 7:00 a 20:00</span></div>
+                </div>
+                <div class="pantalla">
+                  <span class="pantalla__paso">Durante · 1 de 3</span>
+                  <span class="pantalla__grande">Escriba su placa</span>
+                  <span class="pantalla__placa"><b>P</b>123ABC</span>
+                  <span>Q3 por 30 min · máx. 4 h</span>
+                  <span class="pantalla__barra">Continuar</span>
+                </div>
+                <div class="pantalla">
+                  <span class="pantalla__paso">Después</span>
+                  <span class="pantalla__grande pantalla__ok">Pago registrado</span>
+                  <span class="pantalla__fila"><span>Placa</span><b>P 123ABC</b></span>
+                  <span class="pantalla__fila"><span>Vence</span><b>11:00</b></span>
+                  <span class="pantalla__fila"><span>Folio</span><b>0412-0001</b></span>
+                  <span>Sin boleto que colocar.</span>
+                </div>
+              </div>
+              <div class="parq__ranura"></div>
+            </div>
+            <div class="parq__poste"></div>
+          </div>
+        </div>
+        <div>
+          <h2 class="solo-lector">La información, por momento de uso</h2>
+          <ol class="pasos">
+            <li class="paso"><span class="paso__n">01 · Antes del uso</span><h3>Saber que es zona de cobro, y cuánto cuesta.</h3>
+              <p>Señal con el color de la banqueta, la tarifa y el número del parquímetro. Si la tarifa está a la vista, nadie le paga de más a un cuidacarros.</p></li>
+            <li class="paso"><span class="paso__n">02 · Durante</span><h3>Tres pasos: placa, tiempo y pago.</h3>
+              <p>Una pantalla por paso, con la tarifa siempre arriba. Monedas, tarjeta o QR. El aviso «este es el único cobro» va en el paso de pago.</p></li>
+            <li class="paso"><span class="paso__n">03 · Después</span><h3>Un comprobante que sirve para reclamar.</h3>
+              <p>Folio, hora de vencimiento y la línea de atención. La app avisa 10 minutos antes y deja extender el tiempo sin volver.</p></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUCIÓN -->
+  <section class="seccion tono-b" id="solucion">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">La solución</p>
+        <h2 class="titulo">Evaluamos cuatro alternativas y elegimos pagar por placa con el equipo que ya se compró.</h2>
+        <p class="bajada">Cada alternativa se miró desde las cuatro perspectivas de la consigna: arquitectura del software, calidad, ciclo de vida y arquitectura de la información.</p>
+      </header>
+      <ul class="bento revelar">
+        <li class="tarjeta b-a"><p class="bento__dato">S-2</p><h3>Pago por placa, conectado</h3>
+          <p>Monedas, tarjeta o celular. El pago queda en la placa, desaparece el boleto y el verificador consulta en su teléfono. Ataca cinco de los seis problemas.</p><span class="etiqueta">El núcleo</span></li>
+        <li class="tarjeta b-b"><h3>S-1 · Rediseñar la información</h3><p>Lo que hizo Smartmedia. Queda adentro de S-2 como forma de diseñar y aceptar cada pantalla.</p><span class="etiqueta">Dentro</span></li>
+        <li class="tarjeta b-c"><h3>S-3 · Sensores y tarifa por demanda</h3><p>Como San Francisco. Caro y expuesto al vandalismo: se activa cuando haya datos.</p><span class="etiqueta">Después</span></li>
+        <li class="tarjeta b-d"><h3>S-4 · Gobierno comunitario</h3><p>Consulta previa a los vecinos, tablero público del 70/30 y un protocolo para los cuidacarros. Ningún software resuelve solo los problemas 1, 2 y 6.</p><span class="etiqueta">Alrededor</span></li>
+      </ul>
+
+      <header class="cabecera revelar" style="margin-top:var(--aire)">
+        <p class="antetitulo">Arquitectura del software</p>
+        <h2 class="titulo">Cada proceso es un servicio, y los servicios se avisan con eventos.</h2>
+        <p class="bajada">Estilo principal SOA: los cinco procesos del negocio son cinco servicios independientes. Cuando alguien paga, el parquímetro publica «pago registrado» y reaccionan la base de datos, las notificaciones y el tablero, sin conocerse entre sí.</p>
+      </header>
+      <figure class="figura revelar">
+        <img src="img/bloques-parq.svg" width="1640" height="1040" loading="lazy"
+             alt="Diagrama de bloques: el parquímetro, la app del conductor, la app del verificador y la telemetría publican eventos; un enrutador los entrega a la base de sesiones, al sistema de multas, a las notificaciones y al tablero de transparencia.">
+        <figcaption>Diagrama de bloques de SIEP: productores, enrutador y consumidores de eventos.</figcaption>
+      </figure>
+      <ul class="decisiones revelar">
+        <li class="decision"><strong>El pago queda en la placa</strong><p>No hay boleto que se caiga ni que haya que leer.</p></li>
+        <li class="decision"><strong>Se encienden tarjeta y alarma</strong><p>Funciones del equipo comprado que estaban apagadas.</p></li>
+        <li class="decision"><strong>La multa nace del oficial</strong><p>El verificador registra evidencia; el oficial confirma.</p></li>
+        <li class="decision"><strong>Todo lo cobrado se publica</strong><p>Tablero con el 70/30 conciliado con el banco.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CALIDAD -->
+  <section class="seccion tono-a" id="calidad" aria-labelledby="t-calidad">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">Calidad del software</p>
+        <h2 class="titulo" id="t-calidad">Nos comprometemos con cuatro números que se pueden medir.</h2>
+        <p class="bajada">Modelo ISO 9126 del programa: calidad del producto y calidad en uso. El 72 % es el criterio del caso: 80 % encuentra la información y, de ellos, 90 % la usa bien.</p>
+      </header>
+      <dl class="cifras revelar">
+        <div class="cifra"><dt><span class="cifra__num"><span data-contar="72">72</span><span class="cifra__unidad">%</span></span></dt><dd><strong>Eficacia:</strong> conductores que pagan sin ayuda la primera vez.</dd></div>
+        <div class="cifra"><dt><span class="cifra__num"><span data-contar="2">2</span><span class="cifra__unidad">s</span></span></dt><dd><strong>Rendimiento:</strong> para saber si una placa pagó, en 95 de cada 100 consultas.</dd></div>
+        <div class="cifra"><dt><span class="cifra__num">0</span></dt><dd><strong>Disponibilidad:</strong> pagos perdidos aunque se caiga la señal. El equipo guarda y reenvía.</dd></div>
+        <div class="cifra"><dt><span class="cifra__num"><span data-contar="100">100</span><span class="cifra__unidad">%</span></span></dt><dd><strong>Seguridad:</strong> multas con foto, hora, ubicación y confirmación del oficial.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- PROTOTIPO -->
+  <section class="seccion tono-b" id="prototipo">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">Parte desarrollada</p>
+        <h2 class="titulo">Probá el prototipo: el mismo que usamos para medir el 72 %.</h2>
+        <p class="bajada">Escribí una placa, elegí el tiempo y pagá. El panel de la derecha cronometra cada intento y calcula la eficacia contra el criterio acordado. Usa el tarifario real de la capital.</p>
+        <p><a class="enlace" href="prototipo.html">Abrir el prototipo en su propia ventana <svg class="icono" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></p>
+      </header>
+      <div class="marco revelar">
+        <div class="marco__barra" aria-hidden="true"><i></i><i></i><i></i><span>Parquímetro 0412 · prototipo</span></div>
+        <iframe src="prototipo.html?tema=light" title="Prototipo interactivo del parquímetro con pago por placa" loading="lazy"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- CICLO DE VIDA -->
+  <section class="seccion tono-a" id="ciclo">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">Arquitectura en el ciclo de vida</p>
+        <h2 class="titulo">Se construye en espiral por fuera y con Scrum por dentro.</h2>
+        <p class="bajada">Con los siete factores de la clase: la pantalla se descubre probando con personas, cada Delegación es distinta y hay riesgos fuertes al inicio.</p>
+      </header>
+      <div class="metodos revelar">
+        <div class="tarjeta"><h3 style="margin-top:0">Espiral</h3><p>Cada vuelta empieza revisando los riesgos: legales, vandalismo y aceptación de los vecinos.</p></div>
+        <div class="tarjeta"><h3 style="margin-top:0">Scrum con arquitectura</h3><p>Pasos 1, 2, 4 y 9 de la lámina de clase: especificar y priorizar los casos de uso, arquitectura base en el primer sprint y refinarla en cada sprint.</p></div>
+      </div>
+      <ol class="fases revelar">
+        <li class="fase"><span class="fase__n">0</span><h3>Concertación</h3><p>Consulta en una colonia piloto, comité vecinal y conteo de cuidacarros con la PDH.</p></li>
+        <li class="fase"><span class="fase__n">1</span><h3>Pago por placa</h3><p>Equipo reconfigurado, verificación por placa y multa con evidencia.</p></li>
+        <li class="fase"><span class="fase__n">2</span><h3>App y red monitoreada</h3><p>Pago desde el celular, avisos, alarma de vandalismo y reportes.</p></li>
+        <li class="fase"><span class="fase__n">3</span><h3>Datos y sensores</h3><p>Con datos de ocupación: sensores y tarifa por demanda.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PREGUNTAS -->
+  <section class="seccion tono-b" id="preguntas">
+    <div class="contenedor">
+      <header class="cabecera cabecera--centro revelar">
+        <p class="antetitulo">Preguntas del caso</p>
+        <h2 class="titulo">Cinco de las catorce, en corto.</h2>
+        <p class="bajada">Las catorce respuestas completas están en el documento, sección 6.</p>
+      </header>
+      <div class="faq revelar">
+        <div class="faq__item faq__item--abierta">
+          <h3><button class="faq__boton" type="button" aria-expanded="true" aria-controls="faq-1">¿Por qué el nivel óptimo es 72 %?<svg class="icono" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></h3>
+          <div class="faq__panel" id="faq-1"><div><p>Es el producto de dos probabilidades: 80 % encuentra la información (la gente usa el parquímetro con prisa) por 90 % que la usa bien. Proponemos además fijar un umbral por tarea, según lo que cuesta fallar.</p></div></div>
+        </div>
+        <div class="faq__item">
+          <h3><button class="faq__boton" type="button" aria-expanded="false" aria-controls="faq-2">¿Qué problema resuelve mejor la metodología del caso?<svg class="icono" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></h3>
+          <div class="faq__panel" id="faq-2"><div><p>Las instrucciones de pago (P-03) y, en parte, la frustración del primer uso (P-04). La falta de personal (P-05) pudo abordarse más a fondo: el equipo ya traía pago electrónico y alarma.</p></div></div>
+        </div>
+        <div class="faq__item">
+          <h3><button class="faq__boton" type="button" aria-expanded="false" aria-controls="faq-3">¿Qué otros sistemas habrían resuelto mejor los problemas?<svg class="icono" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></h3>
+          <div class="faq__panel" id="faq-3"><div><p>El de Seattle cubre el momento «antes del uso» con información en web y app. El de San Francisco automatiza la supervisión con sensores, pero es caro. La mejor relación era habilitar lo que ya tenía el equipo y sumar la información de Seattle.</p></div></div>
+        </div>
+        <div class="faq__item">
+          <h3><button class="faq__boton" type="button" aria-expanded="false" aria-controls="faq-4">¿Cómo ayudó el bodystorming?<svg class="icono" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></h3>
+          <div class="faq__panel" id="faq-4"><div><p>Bodystorming es recrear la calle en una sala y actuar la situación. Le devolvió a Smartmedia el contexto que el permiso faltante le quitó: la prisa, la distancia al carro y la falta de cambio.</p></div></div>
+        </div>
+        <div class="faq__item">
+          <h3><button class="faq__boton" type="button" aria-expanded="false" aria-controls="faq-5">¿Hay que rediseñar la información constantemente?<svg class="icono" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></h3>
+          <div class="faq__panel" id="faq-5"><div><p>Sí, pero con método: cuando la medición cae debajo del umbral o cambia el contexto. Por eso la tarifa y los textos son configuración, y el desempeño se mide en producción.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPO -->
+  <section class="seccion tono-a" id="equipo">
+    <div class="contenedor">
+      <header class="cabecera revelar">
+        <p class="antetitulo">Grupo 2</p>
+        <h2 class="titulo">Tres roles, una entrega versionada con GitFlow.</h2>
+      </header>
+      <ul class="grilla revelar">
+        <li class="tarjeta persona"><h3>Santiago Julián Barrera Reyes</h3><p class="persona__rol">Scrum Master · coordinador</p><p>Análisis del caso, investigación en Guatemala, arquitectura en el ciclo de vida e integración.</p></li>
+        <li class="tarjeta persona"><h3>Jemima Solmaira Chavajay Quiejú</h3><p class="persona__rol">Product Owner</p><p>Problemas y requisitos de desempeño, calidad del software y arquitectura de la información.</p></li>
+        <li class="tarjeta persona"><h3>Byron Josué Par Rancho</h3><p class="persona__rol">Equipo de desarrollo</p><p>Alternativas de solución, arquitectura del software y prototipo.</p></li>
+      </ul>
+      <p class="ramas revelar"><span class="rama"><svg class="icono" aria-hidden="true"><use href="#i-git-branch"/></svg>main</span>
+        <span class="rama"><svg class="icono" aria-hidden="true"><use href="#i-git-branch"/></svg>develop</span>
+        <span class="rama"><svg class="icono" aria-hidden="true"><use href="#i-git-branch"/></svg>feature/*</span>
+        <span class="rama"><svg class="icono" aria-hidden="true"><use href="#i-git-branch"/></svg>release/*</span>
+        <span>Una rama por entregable, integradas en develop y publicadas en main con una versión etiquetada.</span></p>
+    </div>
+  </section>
+
+  <!-- DESCARGAS -->
+  <section class="seccion tono-a cta" id="descargas">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="contenedor revelar">
+      <h2 class="titulo" style="margin-inline:auto">Todo el trabajo, para leer y presentar.</h2>
+      <p class="bajada">El documento completo con carátula, índice y referencias; la presentación animada con el guion en las notas; y un guion por integrante.</p>
+      <p class="descargas">
+        <a class="btn btn--grande magnetico" href="../documento/Grupo2_CasoParquimetros.pdf"><svg class="icono" aria-hidden="true"><use href="#i-file-text"/></svg>Documento (PDF)</a>
+        <a class="btn btn--grande btn--sec" href="../presentacion/Grupo2_CasoParquimetros_Presentacion.pptx"><svg class="icono" aria-hidden="true"><use href="#i-presentation"/></svg>Presentación (PPTX)</a>
+        <a class="btn btn--grande btn--sec" href="../presentacion/guiones/"><svg class="icono" aria-hidden="true"><use href="#i-download"/></svg>Guiones</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="seccion tono-a pie">
+  <div class="contenedor">
+    <div class="pie__grid">
+      <div><h2>El curso</h2><p>Análisis y Diseño de Sistemas 2 · Sección A<br>Escuela de Ingeniería en Ciencias y Sistemas, USAC<br>Catedrática: MBA. MSc. Claudia Rojas de Morán</p></div>
+      <nav aria-label="Secciones"><h2>Secciones</h2><ul><li><a href="#problema">Problema</a></li><li><a href="#solucion">Solución</a></li><li><a href="#calidad">Calidad</a></li><li><a href="#prototipo">Prototipo</a></li></ul></nav>
+      <div><h2>Fuentes</h2><ul>
+        <li>Morales Zaragoza, N. (2015). <em>Repensando los parquímetros</em>. UAM Cuajimalpa.</li>
+        <li><a href="https://lahora.gt/nacionales/hloarca/2024/02/20/las-tarifas-por-estacionarse-en-la-via-publica/">La Hora (2024): tarifas en la vía pública</a></li>
+        <li><a href="https://emisorasunidas.com/2023/02/27/retiran-objetos-estacionamientos-publicos-capital/">Emisoras Unidas (2023): 2,500 objetos retirados</a></li>
+        <li><a href="https://emisorasunidas.com/nacional/2026/04/27/operativo-parqueos-cuida-carros-cobros-turistas-zoologico-zona-13/">Emisoras Unidas (2026): operativo en la zona 13</a></li>
+        <li><a href="https://lahora.gt/?p=969375">La Hora (2026): recaudación de MarbEx</a></li>
+      </ul></div>
+    </div>
+    <div class="pie__base"><p>© <span id="anio">2026</span> Grupo 2 · Tarea 3, Caso 4.</p><p>Trabajo académico. Íconos Lucide (licencia ISC).</p></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+
+<script>
+(() => {
+  const html = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  $('#anio').textContent = new Date().getFullYear();
+
+  // Tema: claro por omisión; «vitrina» oscuro se elige y se recuerda.
+  const btnTema = $('#tema');
+  const pintarTema = () => {
+    const osc = html.dataset.tema === 'vitrina';
+    btnTema.setAttribute('aria-pressed', String(osc));
+    $('use', btnTema).setAttribute('href', osc ? '#i-sun' : '#i-moon');
+    // el prototipo del iframe sigue el tema del sitio, no el del sistema
+    try { iframe.contentDocument.documentElement.dataset.theme = osc ? 'dark' : 'light'; } catch (e) {}
+  };
+  const iframe = $('#prototipo iframe');
+  iframe.addEventListener('load', () => pintarTema());
+  pintarTema();
+  btnTema.addEventListener('click', () => {
+    if (html.dataset.tema === 'vitrina') delete html.dataset.tema; else html.dataset.tema = 'vitrina';
+    try { localStorage.setItem('tema', html.dataset.tema || 'claro'); } catch (e) {}
+    pintarTema();
+  });
+
+  const nav = $('#nav');
+  new IntersectionObserver(([e]) => nav.classList.toggle('nav--compacta', !e.isIntersecting)).observe($('#centinela'));
+
+  const btnMenu = $('#abrir-menu');
+  const fondo = [$('main'), $('.pie')];
+  const menu = (abrir) => {
+    nav.classList.toggle('nav--abierta', abrir); html.classList.toggle('menu-abierto', abrir);
+    btnMenu.setAttribute('aria-expanded', String(abrir));
+    $('use', btnMenu).setAttribute('href', abrir ? '#i-x' : '#i-menu');
+    fondo.forEach(el => { el.inert = abrir; });
+    if (window.__lenis) abrir ? window.__lenis.stop() : window.__lenis.start();
+  };
+  const cerrarMenu = () => menu(false);
+  btnMenu.addEventListener('click', () => menu(btnMenu.getAttribute('aria-expanded') !== 'true'));
+  matchMedia('(min-width: 62rem)').addEventListener('change', e => { if (e.matches) cerrarMenu(); });
+  $$('#menu a').forEach(a => a.addEventListener('click', cerrarMenu));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && btnMenu.getAttribute('aria-expanded') === 'true') { cerrarMenu(); btnMenu.focus(); } });
+
+  const enlaces = $$('#menu a');
+  const espia = new IntersectionObserver((entradas) => {
+    for (const e of entradas) {
+      if (!e.isIntersecting) continue;
+      enlaces.forEach(a => a.getAttribute('href') === '#' + e.target.id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'));
+    }
+  }, { rootMargin: '-50% 0px -50% 0px' });
+  $$('main section[id]').forEach(sec => espia.observe(sec));
+
+  $$('.faq__boton').forEach(b => b.addEventListener('click', () => {
+    const abrir = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(abrir));
+    b.closest('.faq__item').classList.toggle('faq__item--abierta', abrir);
+  }));
+
+  if (!(window.gsap && window.ScrollTrigger)) { html.classList.remove('mov'); html.classList.add('listo'); return; }
+  gsap.registerPlugin(ScrollTrigger);
+  const EASE = 'expo.out';
+  const mm = gsap.matchMedia();
+
+  mm.add({ mov: '(prefers-reduced-motion: no-preference)', ancho: '(min-width: 48rem)', fino: '(hover: hover) and (pointer: fine)' }, (ctx) => {
+    const { mov, ancho, fino } = ctx.conditions;
+    if (!mov) { html.classList.remove('mov'); return; }
+    html.classList.add('mov');
+    const limpiar = [];
+
+    if (window.Lenis && fino) {
+      const lenis = new Lenis({ anchors: { duration: 1.2, easing: (t) => 1 - Math.pow(2, -10 * t) } });
+      lenis.on('scroll', ScrollTrigger.update);
+      const tic = (t) => lenis.raf(t * 1000);
+      gsap.ticker.add(tic); gsap.ticker.lagSmoothing(0);
+      limpiar.push(() => { gsap.ticker.remove(tic); lenis.destroy(); });
+      window.__lenis = lenis;
+    }
+
+    gsap.fromTo('.mascara > span', { yPercent: 110, opacity: 1 }, { yPercent: 0, duration: 1, ease: EASE, stagger: .12 });
+    gsap.set('.revelar > *', { y: 30 });
+    ScrollTrigger.batch('.revelar > *', { start: 'top 88%', once: true,
+      onEnter: els => gsap.to(els, { opacity: 1, y: 0, duration: .8, ease: EASE, stagger: .1, overwrite: true }) });
+
+    $$('[data-paralaje]').forEach(el => gsap.to(el, { yPercent: +el.dataset.paralaje, ease: 'none',
+      scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } }));
+
+    // Contador: el HTML ya trae el valor final; solo se anima cuando la cifra entra en pantalla.
+    const fmt = new Intl.NumberFormat('en-US');
+    $$('[data-contar]').forEach(el => {
+      const fin = +el.dataset.contar, o = { v: 0 };
+      gsap.to(o, { v: fin, duration: 1.4, ease: 'power2.out', snap: { v: 1 }, onUpdate: () => { el.textContent = fmt.format(o.v); },
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      limpiar.push(() => { el.textContent = fmt.format(fin); });
+    });
+
+    // Escena fija: la pantalla del parquímetro pasa por antes, durante y después mientras se desplaza.
+    if (ancho) {
+      const escena = $('.escena'), pasos = $$('.paso', escena), pantallas = $$('.pantalla', escena);
+      escena.classList.add('escena--fija');
+      limpiar.push(() => escena.classList.remove('escena--fija'));
+      gsap.set(pasos.slice(1), { opacity: 0, y: 30 });
+      gsap.set(pantallas.slice(1), { opacity: 0, y: 20 });
+      const tl = gsap.timeline({ defaults: { ease: 'none' },
+        scrollTrigger: { trigger: '.escena__fija', start: 'top top', end: '+=200%', scrub: 1, pin: true, anticipatePin: 1 } });
+      pasos.forEach((p, i) => {
+        if (!i) return;
+        tl.to(pasos[i - 1], { opacity: 0, y: -30, duration: .25 }, i - .25)
+          .to(p, { opacity: 1, y: 0, duration: .25 }, i)
+          .to(pantallas[i - 1], { opacity: 0, y: -20, duration: .25 }, i - .25)
+          .to(pantallas[i], { opacity: 1, y: 0, duration: .25 }, i);
+      });
+      tl.to({}, { duration: .5 });
+    }
+
+    if (fino) {
+      const tope = gsap.utils.clamp(-6, 6);
+      $$('.magnetico').forEach(b => {
+        const x = gsap.quickTo(b, 'x', { duration: .5, ease: EASE }), y = gsap.quickTo(b, 'y', { duration: .5, ease: EASE });
+        const mover = e => { const r = b.getBoundingClientRect(); x(tope((e.clientX - r.left - r.width / 2) * .2)); y(tope((e.clientY - r.top - r.height / 2) * .2)); };
+        const soltar = () => { x(0); y(0); };
+        b.addEventListener('pointermove', mover); b.addEventListener('pointerleave', soltar);
+        limpiar.push(() => { b.removeEventListener('pointermove', mover); b.removeEventListener('pointerleave', soltar); });
+      });
+    }
+    return () => limpiar.forEach(f => f());
+  });
+  html.classList.add('listo');
+})();
+</script>
+</body>
+</html>
